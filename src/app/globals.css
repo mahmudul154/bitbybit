@@ -1,0 +1,43 @@
+/* src/app/globals.css - SIMPLE & CORRECT v4 SYNTAX */
+
+@import 'tailwindcss';
+
+body {
+  /* Default light mode styles */
+  @apply bg-white text-slate-900;
+  
+  /* Dark mode overrides */
+  @apply dark:bg-slate-900 dark:text-slate-50;
+
+  /* Other base styles */
+  font-family: 'Hind Siliguri', 'Geist', sans-serif;
+  overflow-x: clip;
+  padding-bottom: 64px;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+}
+
+/* src/app/globals.css */
+
+/* --- Reusable Button Classes (Styled for Permanent Dark Theme) --- */
+
+/* Primary Button */
+.btn-primary {
+  /* A bright, solid color for the main call-to-action */
+  @apply bg-indigo-500 text-white hover:bg-indigo-600 rounded-lg px-3 py-2 text-sm font-semibold transition-colors shadow-sm;
+}
+
+/* Large Primary Button */
+.btn-primary-lg {
+  @apply bg-indigo-500 text-white hover:bg-indigo-600 rounded-lg px-5 py-3 font-semibold transition-colors shadow-sm;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  /* An outline button with colors that have good contrast on a dark background */
+  @apply bg-transparent border border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600 rounded-lg px-3 py-2 text-sm font-semibold transition-colors;
+}
