@@ -1,13 +1,13 @@
-/* src/app/globals.css - SIMPLE & CORRECT v4 SYNTAX */
-
 @import 'tailwindcss';
 
+
 body {
-  /* Default light mode styles */
-  @apply bg-white text-slate-900;
-  
-  /* Dark mode overrides */
-  @apply dark:bg-slate-900 dark:text-slate-50;
+  /* 
+    THIS IS THE FIX FOR THE BACKGROUND:
+    We apply the permanent dark theme directly. No `dark:` prefixes.
+    This color will be the base for the entire site.
+  */
+  @apply bg-slate-900 text-slate-50;
 
   /* Other base styles */
   font-family: 'Hind Siliguri', 'Geist', sans-serif;
@@ -21,23 +21,92 @@ body {
   }
 }
 
-/* src/app/globals.css */
 
-/* --- Reusable Button Classes (Styled for Permanent Dark Theme) --- */
 
-/* Primary Button */
+/* Primary Buttons with "Logo" Gradient */
 .btn-primary {
-  /* A bright, solid color for the main call-to-action */
-  @apply bg-indigo-500 text-white hover:bg-indigo-600 rounded-lg px-3 py-2 text-sm font-semibold transition-colors shadow-sm;
+  @apply bg-gradient-to-r from-indigo-500 to-violet-500  text-shadow-white hover:opacity-90 rounded-lg px-3 py-2 text-sm font-semibold transition-opacity shadow-sm;
 }
 
-/* Large Primary Button */
+/* Large Primary Button with "Sera" Yellow Gradient */
 .btn-primary-lg {
-  @apply bg-indigo-500 text-white hover:bg-indigo-600 rounded-lg px-5 py-3 font-semibold transition-colors shadow-sm;
+  @apply bg-gradient-to-r from-indigo-500 to-violet-500  text-shadow-white hover:opacity-90 rounded-lg px-3 py-2 font-semibold transition-opacity shadow-sm;
 }
 
 /* Secondary Button */
 .btn-secondary {
   /* An outline button with colors that have good contrast on a dark background */
   @apply bg-transparent border border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600 rounded-lg px-3 py-2 text-sm font-semibold transition-colors;
+}
+/* Add this to your globals.css if it's not already there */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  /* We use 'forwards' to make sure the element stays visible after animating */
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+/* src/app/globals.css */
+
+
+/* Left side fade */
+.embla:before {
+  left: 0;
+  background: linear-gradient(to right, #0D1224, transparent);
+}
+
+/* Right side fade */
+.embla:after {
+  right: 0;
+  background: linear-gradient(to left, #0D1224, transparent);
+}
+/* Add this to your globals.css */
+
+@keyframes animated-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+/* Add this to your globals.css */
+
+@keyframes slow-pulse {
+  50% {
+    transform: scale(1.03);
+    opacity: 0.95;
+  }
+}
+
+.animate-slow-pulse {
+  animation: slow-pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* src/app/globals.css */
+
+/* --- Section Heading Styles --- */
+.title {
+  /* Controls the font size (and makes it responsive) */
+  @apply text-2xl sm:text-3xl;
+
+  /* Other styles like font weight and color */
+  @apply font-extrabold text-slate-50;
+}
+
+.section-subtitle {
+  /* Controls the top padding (margin) */
+  @apply mt-2; 
+
+  /* Controls the font size and color */
+  @apply text-lg text-slate-400;
+
+  /* Constrains the width for better readability */
+  @apply max-w-3xl;
 }

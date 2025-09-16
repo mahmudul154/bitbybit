@@ -2,24 +2,26 @@
 
 'use client'
 
-import React, { useState } from 'react';
-// Using a simple, high-quality icon library
-import { Home, ClipboardList, RadioTower, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Home, ClipboardList, Gamepad2, Trophy, User } from 'lucide-react';
+import { useAuth } from '@/app/context/AuthContext';
 
+// Define the type for the props clearly at the top
 type NavLinkProps = {
   href: string;
   icon: React.ElementType;
+  label: string;
   isActive: boolean;
   onClick: () => void;
 };
 
-// A simplified NavLink with a modern "pill" highlight for the active state
-const NavLink = ({ href, icon: Icon, isActive, onClick }: NavLinkProps) => {
-  const baseClasses = 'flex items-center justify-center p-2 px-4 rounded-full transition-all duration-200';
-  
-  const activeClasses = 'bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400';
-  
-  const inactiveClasses = 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+// --- THIS IS THE FIX ---
+// The component now correctly uses the NavLinkProps type
+const NavLink = ({ href, icon: Icon, label, isActive, onClick }: NavLinkProps) => {
+  const baseClasses = 'flex flex-col items-center justify-center gap-1 rounded-lg p-2 transition-colors duration-200 w-16';
+  const activeClasses = 'text-indigo-400';
+  const inactiveClasses = 'text-slate-400 hover:bg-slate-800';
 
   return (
     <a 
@@ -27,38 +29,66 @@ const NavLink = ({ href, icon: Icon, isActive, onClick }: NavLinkProps) => {
       onClick={onClick}
       className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
     >
-      {/* Smaller, more refined icon size */}
       <Icon className="h-5 w-5" />
-      <span className="sr-only">{href}</span>
+      <span className="text-[10px] font-medium">{label}</span>
     </a>
   );
 };
 
 export default function MobileNav() {
-  // We keep track of the active link with a simple click state
   const [activeLink, setActiveLink] = useState('home');
+  const { user } = useAuth();
 
-  // NOTE: The complex useEffect for scroll detection has been removed for simplicity and reliability.
-  
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['home', 'exams', 'game', 'olympic']; 
+      let currentSection = 'home';
+      for (const id of sections) {
+        const element = document.getElementById(id);
+        if (element && window.scrollY >= element.offsetTop - window.innerHeight / 2) {
+          currentSection = id;
+        }
+      }
+      setActiveLink(currentSection);
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const profileHref = user ? '/profile' : '/login';
+
   const navItems = [
-    { id: 'home', href: '#', icon: Home },
-    { id: 'exams', href: '#exams', icon: ClipboardList },
-    { id: 'live', href: '#live', icon: RadioTower },
-    { id: 'profile', href: '#profile', icon: User },
+    { id: 'home', href: '#home', icon: Home, type: 'link', label: 'হোম' },
+    { id: 'exams', href: '#exams', icon: ClipboardList, type: 'link', label: 'টেস্ট' },
+    { id: 'game', href: '#game', icon: Gamepad2, type: 'link', label: 'গেম' },
+    { id: 'olympic', href: '#olympic', icon: Trophy, type: 'link', label: 'অলিম্পিয়াড' },
+    { id: 'profile', href: '#profile', icon: User, type: 'pageLink', label: 'প্রোফাইল' }, 
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 border-t border-slate-200 bg-white/95 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 border-t border-slate-800 bg-slate-900/95 backdrop-blur-sm">
       <div className="mx-auto flex h-full max-w-md items-center justify-around">
-        {navItems.map((item) => (
-          <NavLink 
-            key={item.id}
-            href={item.href}
-            icon={item.icon}
-            isActive={activeLink === item.id}
-            onClick={() => setActiveLink(item.id)}
-          />
-        ))}
+        {navItems.map((item) => {
+          if (item.type === 'pageLink') {
+            return (
+              <Link key={item.id} href={item.href} className="flex flex-col items-center justify-center gap-1 rounded-lg p-2 text-slate-400 hover:bg-slate-800 w-16">
+                <item.icon className="h-5 w-5" />
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            )
+          }
+          return (
+            <NavLink 
+              key={item.id}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              isActive={activeLink === item.id}
+              onClick={() => setActiveLink(item.id)}
+            />
+          )
+        })}
       </div>
     </nav>
   );

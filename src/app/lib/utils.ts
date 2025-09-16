@@ -35,6 +35,14 @@ export function bnDifficulty(difficulty: 'Easy' | 'Medium' | 'Hard') {
   }
   return map[difficulty]
 }
+// src/lib/utils.ts
+
+// ... (your other functions like formatDate, etc.)
+
+export const getBengaliChoiceLetter = (index: number): string => {
+  const letters = ['ক', 'খ', 'গ', 'ঘ'];
+  return letters[index] || '';
+};
 
 // Get Tailwind CSS classes for difficulty pill
 export function pillForDifficulty(difficulty: 'Easy' | 'Medium' | 'Hard') {

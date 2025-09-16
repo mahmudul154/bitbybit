@@ -54,7 +54,7 @@ export const JOBS: Job[] = [
     id: 1,
     type: 'Engineering',
     title: 'বুয়েট ভর্তি বিজ্ঞপ্তি ২০২৪',
-    location: 'ঢাকা',
+    location: 'ঢাকা বিশ্ববিদ্যালয়, বুয়েট',
     deadline: new Date('2024-09-25'),
     tags: ['ইঞ্জিনিয়ারিং', 'আর্কিটেকচার'],
   },
@@ -62,7 +62,7 @@ export const JOBS: Job[] = [
     id: 2,
     type: 'Public University',
     title: 'ঢাকা বিশ্ববিদ্যালয় (ক ইউনিট) বিজ্ঞপ্তি',
-    location: 'ঢাকা',
+    location: 'ঢাকা,চট্টগ্রাম,রাজশাহী',
     deadline: new Date('2024-10-10'),
     tags: ['বিজ্ঞান', 'ফার্মেসি', 'বায়োটেকনোলজি'],
   },
@@ -78,25 +78,49 @@ export const JOBS: Job[] = [
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard'
 
+// --- THIS IS THE ADJUSTED PART ---
+// The 'id' property is now a string to match our quiz system
 export type Test = {
-  id: number
+  id: string 
   title: string
   difficulty: Difficulty
   questions: number
   duration: number // in minutes
 }
 
+// The 'id' values now match the keys in your quizzes.ts file
 export const MCQ_TESTS: Test[] = [
-  { id: 1, title: 'পদার্থবিজ্ঞান ফাইনাল মডেল টেস্ট', difficulty: 'Medium', questions: 25, duration: 20 },
-  { id: 2, title: 'রসায়ন (জৈব যৌগ) স্পেশাল টেস্ট', difficulty: 'Hard', questions: 30, duration: 25 },
-  { id: 3, title: 'গণিত (ক্যালকুলাস) কুইক টেস্ট', difficulty: 'Easy', questions: 20, duration: 15 },
+  { 
+    id: 'physics-thermo-1', // THIS ID NOW MATCHES YOUR QUIZ DATA
+    title: 'পদার্থবিজ্ঞান: তাপমাত্রা ও থার্মোমিতি', 
+    difficulty: 'Medium', 
+    questions: 7, 
+    duration: 5 
+  },
+  { 
+    id: 'chemistry-organic-1', // Assuming this is the ID for your second quiz
+    title: 'রসায়ন (জৈব যৌগ) স্পেশাল টেস্ট', 
+    difficulty: 'Hard', 
+    questions: 30, // Example
+    duration: 25 // Example
+  },
+  { 
+    id: 'math-calculus-1', // Example for a third quiz
+    title: 'গণিত (ক্যালকুলাস) কুইক টেস্ট', 
+    difficulty: 'Easy', 
+    questions: 20, // Example
+    duration: 15 // Example
+  },
 ]
 
+// The WRITTEN_TESTS can also be updated to use string IDs for future-proofing
 export const WRITTEN_TESTS: Test[] = [
-  { id: 1, title: 'বুয়েট লিখিত মডেল টেস্ট', difficulty: 'Hard', questions: 10, duration: 90 },
-  { id: 2, title: 'উচ্চতর গণিত লিখিত অনুশীলন', difficulty: 'Medium', questions: 8, duration: 60 },
-  { id: 3, title: 'পদার্থবিজ্ঞান লিখিত অনুশীলন', difficulty: 'Medium', questions: 8, duration: 60 },
+  { id: 'buet-written-1', title: 'বুয়েট লিখিত মডেল টেস্ট', difficulty: 'Hard', questions: 10, duration: 90 },
+  { id: 'math-written-1', title: 'উচ্চতর গণিত লিখিত অনুশীলন', difficulty: 'Medium', questions: 8, duration: 60 },
+  { id: 'physics-written-1', title: 'পদার্থবিজ্ঞান লিখিত অনুশীলন', difficulty: 'Medium', questions: 8, duration: 60 },
 ]
+// --- END OF ADJUSTED PART ---
+
 
 export const TOPICS: { key: string; name: string }[] = [
   { key: 'math', name: 'গণিত' },

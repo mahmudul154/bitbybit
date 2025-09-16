@@ -1,0 +1,173 @@
+// src/app/create-profile/page.tsx
+'use client'
+
+import React, { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useAuth } from '@/app/context/AuthContext'
+import { updateProfile } from 'firebase/auth'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/lib/firebase'
+import { Camera } from 'lucide-react'
+import Image from 'next/image'
+
+export default function CreateProfilePage() {
+  // --- LOGIC SECTION ---
+  const { user, refreshUser } = useAuth(); // Get the refreshUser function
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [displayName, setDisplayName] = useState('');
+  const [institution, setInstitution] = useState('');
+  const [hscBatch, setHscBatch] = useState('');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      if (user.displayName) setDisplayName(user.displayName);
+      if (user.photoURL) setPhotoPreview(user.photoURL);
+    }
+  }, [user]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleProfileSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setError('You must be logged in to create a profile.');
+      return;
+    }
+    if (!displayName || !institution || !hscBatch) {
+      setError('Please fill out all the required fields.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      let photoURL = user.photoURL;
+
+      if (photoFile) {
+        const storageRef = ref(storage, `profile-pictures/${user.uid}/${photoFile.name}`);
+        const snapshot = await uploadBytes(storageRef, photoFile);
+        photoURL = await getDownloadURL(snapshot.ref);
+      }
+
+      await updateProfile(user, {
+        displayName: displayName,
+        photoURL: photoURL,
+      });
+
+      // Refresh the user state in the context BEFORE redirecting
+      await refreshUser();
+      
+      console.log("Profile Saved & Refreshed!");
+      // In a real app, save extra data (institution, hscBatch) to Firestore here
+      console.log("Institution:", institution, "HSC Batch:", hscBatch);
+
+      router.push('/');
+      
+    } catch (err) {
+      console.error("Error creating profile:", err);
+      setError('Failed to save profile. Please try again.');
+      setIsLoading(false); // Only stop loading if there's an error
+    }
+  };
+
+  // --- UI SECTION (Your exact code, with only minor corrections) ---
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="flex justify-center">
+          <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
+            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+              BitByBit
+            </span>
+          </Link>
+        </div>
+        <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">আপনার প্রোফাইল সেটআপ করুন</h1>
+        <p className="mt-2 text-center text-sm text-slate-400">আপনার একাউন্ট প্রায় তৈরি! এই তথ্যগুলো অন্যদের আপনাকে চিনতে সাহায্য করবে।</p>
+
+        <form onSubmit={handleProfileSave} className="mt-8 space-y-6">
+          <div className="flex justify-center">
+            <input 
+              type="file" 
+              accept="image/*" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              className="hidden" 
+            />
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="relative h-24 w-24 rounded-full border-2 border-dashed border-slate-700 flex items-center justify-center group bg-slate-800"
+            >
+              {photoPreview ? (
+                <Image src={photoPreview} alt="Profile Preview" fill className="rounded-full object-cover" />
+              ) : (
+                <span className="text-xs text-slate-500">ছবি আপলোড</span>
+              )}
+              <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="text-white" />
+              </div>
+            </button>
+          </div>
+
+          <div>
+            <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-slate-300">পুরো নাম</label>
+            <input 
+              id="fullName" 
+              type="text" 
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              placeholder="আপনার পুরো নাম" 
+              className="block w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-300 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="institution" className="mb-2 block text-sm font-medium text-slate-300">শিক্ষা প্রতিষ্ঠান</label>
+            <input 
+              id="institution" 
+              type="text" 
+              value={institution}
+              onChange={(e) => setInstitution(e.target.value)}
+              required
+              placeholder="আপনার কলেজের নাম" 
+              className="block w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-300 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+            />
+          </div>
+
+          <div>
+            <label htmlFor="hscBatch" className="mb-2 block text-sm font-medium text-slate-300">এইচএসসি ব্যাচ</label>
+            <input 
+              id="hscBatch" 
+              type="number" 
+              value={hscBatch}
+              onChange={(e) => setHscBatch(e.target.value)}
+              required
+              placeholder="e.g., 2025" 
+              className="block w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-300 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+            />
+          </div>
+
+          {error && <p className="text-red-500 text-center text-xs">{error}</p>}
+          <button type="submit" disabled={isLoading} className="btn-primary-lg w-full disabled:opacity-50 disabled:cursor-not-allowed">
+            {isLoading ? 'সেভ হচ্ছে...' : 'সেভ করে এগিয়ে যান'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}

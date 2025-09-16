@@ -1,68 +1,125 @@
 // src/app/components/Hero.tsx
-
 'use client'
 
-import ChipCarousel from './ChipCarousel' // Import the new carousel
+import { motion } from 'framer-motion' // Import framer-motion
 import { StatsRow } from './Stats'
+import ChipCarousel from './ChipCarousel';
+
+// Define the data for the desktop buttons
+const desktopChips = [
+  { text: "🎮 গেম", href: "#game" },
+  { text: "🏆 অলিম্পিয়াড", href: "#olympic" },
+  { text: "🔴 লাইভ মডেল টেস্ট", href: "#live" },
+  { text: "📚 প্রশ্নব্যাংক", href: "#previous" },
+  { text: "📝 অধ্যায়ভিত্তিক পরীক্ষা", href: "#topics" },
+  { text: "📊 র‍্যাঙ্কিং ও অ্যানালিটিক্স", href: "#exams" },
+];
+
+// Animation variants for the container and its children
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2, // Time delay between each child animating in
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: 'easeOut',
+    },
+  },
+};
+
 
 export default function Hero() {
   return (
-    // The background color is set to match the navbar
     <section id="home" className="relative overflow-hidden bg-slate-900">
       
       {/* Blueprint grid pattern */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none opacity-20"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(2, 6, 23, 0.04) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(2, 6, 23, 0.04) 1px, transparent 1px)
-          `,
-          backgroundSize: '30px 30px',
-        }}
+        style={{ /* ... blueprint styles ... */ }}
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* The grid is now always a single column */}
-        <div className="grid grid-cols-1 gap-8 items-center py-10 sm:py-14 md:py-20">
+        <div className="grid grid-cols-1 gap-8 items-center py-24 sm:py-32">
           
-          {/* Main content container is now always centered */}
-          <div className="text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
-              <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" /> বিশ্ববিদ্যালয় ও ইঞ্জিনিয়ারিং ভর্তি প্রস্তুতি
-            </span>
+          {/* Main content container is now the animation parent */}
+          <motion.div 
+            className="text-center px-4 sm:px-0"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible" // Animate automatically on load
+          >
+         
+            {/* The h1 is now a motion component with its own variant */}
+            <motion.h1 
+              variants={itemVariants}
+              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-slate-50"
+            >
+              ভর্তি পরীক্ষার <span className="bg-gradient-to-r from-indigo-500 to-violet-500  bg-clip-text text-transparent">সেরা</span> প্রস্তুতি,
+            </motion.h1>
+
+            {/* A second h1 for the second line, which will animate in after the first */}
+            <motion.h1 
+              variants={itemVariants}
+              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-slate-50"
+            >
+              এখন তোমার হাতের মুঠোয়।
+            </motion.h1>
             
-            <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-slate-50">
-              <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">ভর্তি</span> পরীক্ষার সেরা প্রস্তুতি, এখন তোমার হাতের মুঠোয়।
-            </h1>
-            
-            <p className="mt-3 max-w-2xl mx-auto text-slate-400 text-base sm:text-lg">
+            <motion.p 
+              variants={itemVariants}
+              className="mt-4 max-w-2xl mx-auto text-slate-400 text-base sm:text-lg"
+            >
               মডেল টেস্ট, প্রশ্নব্যাংক, লেকচার ও অ্যানালিটিক্স—সেরা প্রস্তুতির জন্য যা যা প্রয়োজন, সবই এক প্ল্যাটফর্মে।
-            </p>
+            </motion.p>
 
-            <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 justify-center">
-              {/* Buttons are now always the smaller size for a cleaner look */}
-              <a href="#exams" className="btn-primary inline-flex w-auto">
-                মডেল টেস্ট শুরু করো
+            <motion.div 
+              variants={itemVariants}
+              className="mt-8 flex flex-col sm:flex-row items-center gap-3 justify-center"
+            >
+              <a href="#live" className="btn-primary-lg inline-flex w-auto">
+                লাইভ এক্সাম
               </a>
-              <a href="#circulars" className="btn-secondary inline-flex w-auto">
-                ভর্তি তথ্য দেখুন
-              </a>
-            </div>
+            </motion.div>
 
-            <div className="max-w-sm mx-auto">
+            <motion.div variants={itemVariants} className="mt-10 max-w-sm mx-auto">
               <StatsRow />
-            </div>
+            </motion.div>
 
-            {/* --- REPLACED THE OLD SCROLLER WITH THE NEW CAROUSEL --- */}
-            <div className="mt-8 max-w-md mx-auto">
-              <ChipCarousel />
-            </div>
-          </div>
+            {/* DESKTOP CHIP BUTTONS */}
+            <motion.div 
+              variants={itemVariants}
+              className="hidden md:flex flex-wrap items-center justify-center gap-3 mt-10 max-w-4xl mx-auto"
+            >
+              {desktopChips.map((chip) => (
+                <a 
+                  key={chip.text} 
+                  href={chip.href}
+                  className="group relative rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 transition-all duration-300 hover:border-transparent"
+                >
+                  <div className="absolute "></div>
+                  <span className="relative">{chip.text}</span>
+                </a>
+              ))}
+            </motion.div>
 
-          {/* The entire floating chips div has been removed */}
+            {/* MOBILE CHIP CAROUSEL */}
+            <motion.div variants={itemVariants} className="mt-10 max-w-md mx-auto md:hidden">
+              <ChipCarousel/>
+            </motion.div>
 
+          </motion.div>
         </div>
       </div>
     </section>
