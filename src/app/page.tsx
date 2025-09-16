@@ -1,21 +1,38 @@
+// src/app/page.tsx
 'use client'
 
-//import YTThumb from './components/YTThumb'
 import Link from 'next/link'
 import React, { useEffect, useMemo, useState } from 'react'
 import Hero from './components/Hero'
 import Section from './components/Section'
-import Footer from './components/Footer'
+import Footer from './components/Footer' // <-- I've added the Footer import back
 import { FEATURES, JOBS, MCQ_TESTS, WRITTEN_TESTS, TOPICS, PREVIOUS_SOLVES, VIDEOS, POSTS } from '@/app/data/site'
 import { bnDifficulty, formatDate, getCountdown, pillForDifficulty } from './lib/utils'
 
 type Mode = 'MCQ' | 'Written'
+
+// The TimeCell component remains the same
+function TimeCell({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 min-w-[70px]">
+      <div className="text-xl font-extrabold text-slate-50">{value.toString().padStart(2, '0')}</div>
+      <div className="text-[11px] text-slate-400">{label}</div>
+    </div>
+  )
+}
 
 export default function Page() {
   const [mode, setMode] = useState<Mode>('MCQ')
   const [activeTopic, setActiveTopic] = useState('math')
   const liveExamDate = useMemo(() => new Date(Date.now() + 1000 * 60 * 60 * 24 * 8 + 1000 * 60 * 20), [])
   const [countdown, setCountdown] = useState(getCountdown(liveExamDate))
+  
+  // --- HYDRATION FIX ---
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+  // --- END FIX ---
 
   useEffect(() => {
     const t = setInterval(() => setCountdown(getCountdown(liveExamDate)), 1000)
@@ -67,8 +84,6 @@ export default function Page() {
         </div>
       </Section>
 
-  
-
       {/* Practice */}
       <Section id="exams" title="প্র্যাকটিস পরীক্ষা" subtitle="এমসিকিউ/লিখিত বদলান। সময়ভিত্তিক ও অ্যানালিটিক্স-সহ।">
         <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-1">
@@ -83,16 +98,12 @@ export default function Page() {
                 <span className={`text-xs font-bold rounded-full px-2 py-1 border ${pillForDifficulty(t.difficulty)}`}>{bnDifficulty(t.difficulty)}</span>
               </div>
               <p className="mt-1 text-sm text-slate-400">{t.questions}টি প্রশ্ন • {t.duration} মিনিট</p>
-              
-              {/* --- THIS IS THE UPDATED PART --- */}
-             
-             <div className="mt-4 flex gap-2">
-  {/* The href now builds the URL with the specific quiz ID */}
-  <Link href={`/quiz?quizId=${t.id}`} className="btn-secondary">
-    পরীক্ষা দিন
-  </Link>
-
-</div>
+              <div className="mt-4 flex gap-2">
+                <Link href={`/quiz?quizId=${t.id}`} className="btn-primary">
+                  পরীক্ষা দিন
+                </Link>
+                <button className="btn-secondary">সিলেবাস দেখুন</button>
+              </div>
             </div>
           ))}
         </div>
@@ -105,7 +116,7 @@ export default function Page() {
             <button
               key={t.key}
               onClick={() => setActiveTopic(t.key)}
-              className={`rounded-full border px-3 text-white py-1.5 text-sm font-semibold transition ${activeTopic === t.key ? 'bg-indigo-950 text--300 border-indigo-800' : 'border-slate-800 bg-slate-900 hover:bg-slate-800'}`}
+              className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${activeTopic === t.key ? 'bg-indigo-950 text-indigo-300 border-indigo-800' : 'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300'}`}
             >
               {t.name}
             </button>
@@ -119,7 +130,7 @@ export default function Page() {
             <li>চ্যাপ্টার ফাইনাল (৫০টি প্রশ্ন • ৪৫ মিনিট)</li>
           </ul>
           <div className="mt-4 flex gap-2">
-            <button className="btn-secondary">স্ট্যান্ডার্ড টেস্ট শুরু</button>
+            <button className="btn-primary">স্ট্যান্ডার্ড টেস্ট শুরু</button>
             <button className="btn-secondary">কাস্টমাইজ করুন</button>
           </div>
         </div>
@@ -132,13 +143,28 @@ export default function Page() {
             <h3 className="font-semibold text-slate-50">BitByBit ন্যাশনাল মডেল টেস্ট ২০২২৪</h3>
             <p className="text-sm text-slate-400 mt-1">শুরু হতে বাকি</p>
             <div className="mt-3 flex gap-3">
-              <TimeCell label="দিন" value={countdown.days} />
-              <TimeCell label="ঘণ্টা" value={countdown.hours} />
-              <TimeCell label="মিনিট" value={countdown.minutes} />
-              <TimeCell label="সেকেন্ড" value={countdown.seconds} />
+              
+              {/* --- HYDRATION FIX --- */}
+              {hasMounted ? (
+                <>
+                  <TimeCell label="দিন" value={countdown.days} />
+                  <TimeCell label="ঘণ্টা" value={countdown.hours} />
+                  <TimeCell label="মিনিট" value={countdown.minutes} />
+                  <TimeCell label="সেকেন্ড" value={countdown.seconds} />
+                </>
+              ) : (
+                <>
+                  <TimeCell label="দিন" value={0} />
+                  <TimeCell label="ঘণ্টা" value={0} />
+                  <TimeCell label="মিনিট" value={0} />
+                  <TimeCell label="সেকেন্ড" value={0} />
+                </>
+              )}
+              {/* --- END FIX --- */}
+
             </div>
             <div className="mt-4 flex gap-2">
-              <button className="btn-secondary">ফ্রি রেজিস্ট্রেশন</button>
+              <button className="btn-primary">ফ্রি রেজিস্ট্রেশন</button>
               <button className="btn-secondary">পরীক্ষার নিয়মাবলি</button>
             </div>
           </div>
@@ -168,7 +194,7 @@ export default function Page() {
       </Section>
    
       {/* Blog */}
-      <Section id="blog"  title="টিপস ও ব্লগ" subtitle="সঠিক স্ট্র্যাটেজি, সময় ব্যবস্থাপনা ও অনুপ্রেরণামূলক লেখা।">
+      <Section id="blog" title="টিপস ও ব্লগ" subtitle="সঠিক স্ট্র্যাটেজি, সময় ব্যবস্থাপনা ও অনুপ্রেরণামূলক লেখা।">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {POSTS.map((p) => (
             <div key={p.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4 hover:shadow-lg transition">
@@ -180,14 +206,23 @@ export default function Page() {
         </div>
       </Section>
       
-
-
+      {/* Login / Sign up Section */}
+      <Section id="login-cta" title="আপনার জার্নি শুরু করুন" subtitle="একাউন্ট তৈরি করে অথবা লগইন করে আজই আপনার প্রস্তুতিকে নিয়ে যান এক নতুন স্তরে।">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link href="/signup" className="btn-primary-lg w-full sm:w-auto">
+            নতুন একাউন্ট খুলুন
+          </Link>
+          <Link href="/login" className="btn-secondary w-full sm:w-auto px-5 py-3">
+            লগইন করুন
+          </Link>
+        </div>
+      </Section>
 
       {/* Subscribe CTA */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-16">
         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-center">
-          <h3 className="text-2xl font-extrabold text-slate-50">{`  `}</h3>
-          <h5 className="mt-2 text-slate-400">{`ভর্তি বিজ্ঞপ্তি, লাইভ পরীক্ষার আপডেট ও গুরুত্বপূর্ণ টিপস সরাসরি আপনার ইনবক্সে।`}</h5>
+          <h3 className="text-2xl font-extrabold text-slate-50">{`৫০,০০০+ ভর্তিচ্ছুদের সাথে যুক্ত হোন`}</h3>
+          <p className="mt-2 text-slate-400">{`ভর্তি বিজ্ঞপ্তি, লাইভ পরীক্ষার আপডেট ও গুরুত্বপূর্ণ টিপস সরাসরি আপনার ইনবক্সে।`}</p>
           <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <input type="email" placeholder="আপনার ইমেইল লিখুন" className="w-full sm:w-80 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 placeholder:text-slate-500 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             <button className="btn-primary-lg">সাবস্ক্রাইব করুন</button>
@@ -195,16 +230,7 @@ export default function Page() {
         </div>
       </div>
 
-  
+      <Footer />
     </>
   );
-}
-
-function TimeCell({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="flex flex-col items-center rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 min-w-[70px]">
-      <div className="text-xl font-extrabold text-slate-50">{value.toString().padStart(2, '0')}</div>
-      <div className="text-[11px] text-slate-400">{label}</div>
-    </div>
-  )
 }

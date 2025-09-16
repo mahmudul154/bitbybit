@@ -1,14 +1,13 @@
 // src/app/quiz/QuizComponent.tsx
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getQuizById, Quiz, QuizQuestion } from '@/app/data/quizzes';
 import LoadingScreen from '@/app/components/LoadingScreen';
 import { getBengaliChoiceLetter } from '@/app/lib/utils';
-//import AnimatedLogo from '../components/AnimatedLogo';
 
 const TIME_LIMIT_SECONDS = 300;
 const NEGATIVE_MARKING = 0.25;
@@ -77,17 +76,6 @@ export default function QuizComponent({ quizId }: { quizId: string }) {
             } else { router.replace('/'); }
         }
     }, [quizId, router]);
-
-    useEffect(() => {
-        if (quizState !== 'running' || !quizData) return;
-        const timer = setInterval(() => {
-            setTimeLeft(prevTime => {
-                if (prevTime <= 1) { clearInterval(timer); finishQuiz(); return 0; }
-                return prevTime - 1;
-            });
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [quizState, quizData]);
     
     useEffect(() => {
         if (!authLoading && !user) {
@@ -101,7 +89,7 @@ export default function QuizComponent({ quizId }: { quizId: string }) {
         setSelectedAnswers(newAnswers);
     };
 
-    const finishQuiz = () => {
+    const finishQuiz = useCallback(() => {
         if (!quizData) return;
         let finalScore = 0;
         let correctCount = 0;
@@ -129,12 +117,23 @@ export default function QuizComponent({ quizId }: { quizId: string }) {
         setSkippedAnswers(skippedCount);
         setNegativeMark(incorrectCount * NEGATIVE_MARKING);
         setIncorrectlyAnswered(wrongQuestions);
-        
-        // Placeholder for saving to a database
-        // saveIncorrectQuestionsToProfile(user.uid, wrongQuestions);
-        
         setQuizState('finished');
-    };
+    }, [quizData, selectedAnswers]);
+
+    useEffect(() => {
+        if (quizState !== 'running' || !quizData) return;
+        const timer = setInterval(() => {
+            setTimeLeft(prevTime => {
+                if (prevTime <= 1) { 
+                    clearInterval(timer); 
+                    finishQuiz(); 
+                    return 0; 
+                }
+                return prevTime - 1;
+            });
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [quizState, quizData, finishQuiz]);
     
     if (authLoading || !quizData) {
         return <LoadingScreen />;
