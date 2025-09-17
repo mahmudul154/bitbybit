@@ -4,8 +4,7 @@ import Link from 'next/link'
 import React, { useEffect, useMemo, useState } from 'react'
 import Hero from './components/Hero'
 import Section from './components/Section'
-import Footer from './components/Footer' // <-- I've added the Footer import back, assuming it's used
-import { FEATURES, JOBS, MCQ_TESTS, WRITTEN_TESTS, TOPICS, PREVIOUS_SOLVES, VIDEOS, POSTS } from '@/app/data/site'
+import { FEATURES, JOBS, MCQ_TESTS, WRITTEN_TESTS, TOPICS, PREVIOUS_SOLVES,  POSTS } from '@/app/data/site'
 import { bnDifficulty, formatDate, getCountdown, pillForDifficulty } from './lib/utils'
 
 type Mode = 'MCQ' | 'Written'
@@ -207,8 +206,8 @@ export default function Page() {
       {/* Subscribe CTA */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-16">
         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-center">
-          <h3 className="text-2xl font-extrabold text-slate-50">{`৫০,০০০+ ভর্তিচ্ছুদের সাথে যুক্ত হোন`}</h3>
-          <p className="mt-2 text-slate-400">{`ভর্তি বিজ্ঞপ্তি, লাইভ পরীক্ষার আপডেট ও গুরুত্বপূর্ণ টিপস সরাসরি আপনার ইনবক্সে।`}</p>
+          <h5 className="text-2xl font-extrabold text-slate-50">{`ভর্তি বিজ্ঞপ্তি, লাইভ পরীক্ষার আপডেট ও গুরুত্বপূর্ণ টিপস সরাসরি আপনার ইনবক্সে।`}</h5>
+        
           <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <input type="email" placeholder="আপনার ইমেইল লিখুন" className="w-full sm:w-80 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 placeholder:text-slate-500 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             <button className="btn-primary-lg">সাবস্ক্রাইব করুন</button>

@@ -12,7 +12,7 @@ import { Camera } from 'lucide-react'
 import Image from 'next/image'
 
 export default function CreateProfilePage() {
-  const { user, refreshUser } = useAuth();
+  const {  refreshUser } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
