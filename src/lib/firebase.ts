@@ -1,8 +1,11 @@
 // src/lib/firebase.ts
+
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { getFirestore } from "firebase/firestore"; // 1. Import getFirestore
 
+// Your Firebase configuration object
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,7 +15,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// This pattern prevents re-initializing the app on hot reloads in development.
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
+// Initialize and export Firebase services
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const db = getFirestore(app); // 2. Initialize and export the Firestore database instance

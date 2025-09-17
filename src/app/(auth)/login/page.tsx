@@ -8,7 +8,7 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, getAdd
 import { auth } from '@/lib/firebase'
 
 const GoogleIcon = () => (
-    <svg className="h-5 w-5" viewBox="0 0 48 48">
+  <svg className="h-5 w-5" viewBox="0 0 48 48">
     <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
     <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z" />
     <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.223 0-9.657-3.356-11.303-8h-6.571c3.356 8.464 11.791 14 20.874 14z" />
@@ -22,16 +22,18 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  // --- FIXES ---
-  // 1. handleLogin now correctly uses the 'email' state variable.
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // For any successful login, we just go to the homepage.
-      // The logic to redirect new Google users is in the Google sign-in function.
-      router.push('/');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      if (user && !user.displayName) {
+        router.push('/create-profile');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError("Failed to log in. Please check your credentials.");
       console.error(err);
@@ -40,6 +42,7 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
+    setError('');
     try {
       const result = await signInWithPopup(auth, provider);
       const additionalInfo = getAdditionalUserInfo(result);
@@ -56,15 +59,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4">
+    // --- THIS IS THE ADJUSTED BACKGROUND COLOR ---
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
       <div className="w-full max-w-sm">
-        <div className="flex justify-center">
-            <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
-              <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
-               
-              </span>
-            </Link>
-        </div>
+       
         <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">স্বাগতম!</h1>
         <p className="mt-2 text-center text-sm text-slate-400">লগইন করে আপনার প্রস্তুতি চালিয়ে যান।</p>
 
@@ -81,7 +79,6 @@ export default function LoginPage() {
           </div>
 
           <div>
-            {/* 2. Label text corrected to Bengali */}
             <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-300">ইমেইল এড্রেস</label>
             <input 
               id="email" 
@@ -96,7 +93,6 @@ export default function LoginPage() {
           <div>
             <div className="flex justify-between">
               <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-300">পাসওয়ার্ড</label>
-              {/* 3. "Forgot Password" link text corrected to Bengali */}
               <Link href="/forgot-password" className="text-xs font-medium text-indigo-400 hover:text-indigo-300">পাসওয়ার্ড ভুলে গেছেন?</Link>
             </div>
             <input 
@@ -114,7 +110,7 @@ export default function LoginPage() {
           <button type="submit" className="btn-primary-lg w-full">লগ ইন</button>
         </form>
 
-        <p className="mt-6  mb-48 text-center text-sm text-slate-400">
+        <p className="mt-6 text-center text-sm text-slate-400">
           আপনার কোনো একাউন্ট নেই?{' '}
           <Link href="/signup" className="font-semibold text-indigo-400 hover:text-indigo-300">সাইন আপ করুন</Link>
         </p>

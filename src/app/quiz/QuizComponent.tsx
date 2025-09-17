@@ -153,7 +153,7 @@ export default function QuizComponent({ quizId }: { quizId: string }) {
                     </div>
 
                     <div className="mt-8 bg-[#12182C] border border-[#23293D] p-6 rounded-2xl">
-                        <h2 className="text-xl font-bold text-center mb-4">পারফরম্যান্স ওভারভিউ</h2>
+                        <h2 className="text-l font-bold text-center mb-4">পারফরম্যান্স ওভারভিউ</h2>
                         <div className="space-y-3 text-base">
                             <div className="flex justify-between items-center"><span className="text-slate-300">মোট প্রশ্ন:</span><span className="font-semibold text-slate-50">{quizData.questions.length} টি</span></div>
                             <div className="flex justify-between items-center"><span className="text-slate-300">সঠিক উত্তর:</span><span className="font-semibold text-green-400">{correctAnswers} টি</span></div>

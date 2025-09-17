@@ -1,10 +1,10 @@
 // src/app/components/MobileNav.tsx
-
 'use client'
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Home, ClipboardList, Gamepad2, Trophy, User } from 'lucide-react';
+// --- 1. THE FIX: Corrected icon name ---
+import { Home, ClipboardCheck, Gamepad2, Trophy, User } from 'lucide-react';
 import { useAuth } from '@/app/context/AuthContext';
 
 // Define the type for the props clearly at the top
@@ -16,8 +16,6 @@ type NavLinkProps = {
   onClick: () => void;
 };
 
-// --- THIS IS THE FIX ---
-// The component now correctly uses the NavLinkProps type
 const NavLink = ({ href, icon: Icon, label, isActive, onClick }: NavLinkProps) => {
   const baseClasses = 'flex flex-col items-center justify-center gap-1 rounded-lg p-2 transition-colors duration-200 w-16';
   const activeClasses = 'text-indigo-400';
@@ -60,10 +58,12 @@ export default function MobileNav() {
 
   const navItems = [
     { id: 'home', href: '#home', icon: Home, type: 'link', label: 'হোম' },
-    { id: 'exams', href: '#exams', icon: ClipboardList, type: 'link', label: 'টেস্ট' },
+    // --- 2. THE FIX: Using the corrected icon component ---
+    { id: 'exams', href: '#exams', icon: ClipboardCheck, type: 'link', label: 'টেস্ট' },
     { id: 'game', href: '#game', icon: Gamepad2, type: 'link', label: 'গেম' },
     { id: 'olympic', href: '#olympic', icon: Trophy, type: 'link', label: 'অলিম্পিয়াড' },
-    { id: 'profile', href: '#profile', icon: User, type: 'pageLink', label: 'প্রোফাইল' }, 
+    // --- 3. THE FIX: Using the dynamic profileHref variable ---
+    { id: 'profile', href: profileHref, icon: User, type: 'pageLink', label: 'প্রোফাইল' }, 
   ];
 
   return (

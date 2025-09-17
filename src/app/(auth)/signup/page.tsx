@@ -4,7 +4,6 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-// Ensure this function name is exactly correct
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
@@ -31,11 +30,9 @@ export default function SignupPage() {
       return;
     }
     try {
-      // --- THE FIX: Using the correct Firebase function name ---
       await createUserWithEmailAndPassword(auth, email, password);
       router.push('/create-profile');
     } catch (err: any) {
-      // Provide a more user-friendly error message
       if (err.code === 'auth/email-already-in-use') {
         setError("This email address is already in use.");
       } else {
@@ -47,27 +44,23 @@ export default function SignupPage() {
 
   const handleGoogleSignUp = async () => {
     const provider = new GoogleAuthProvider();
+    setError('');
     try {
       await signInWithPopup(auth, provider);
       router.push('/create-profile');
     } catch (err: any) {
-      setError("Failed to sign up with Google.");
-      console.error(err);
+      // Don't show an error if the user just closes the popup
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError("Failed to sign up with Google.");
+        console.error(err);
+      }
     }
   };
   
-
   return (
-    // --- THE FIX: Matching the background color with the login page ---
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
       <div className="w-full max-w-sm">
-        <div className="flex justify-center">
-          <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
-            <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
        
-            </span>
-          </Link>
-        </div>
 
         <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">নতুন একাউন্ট খুলুন</h1>
         <p className="mt-2 text-center text-sm text-slate-400">সেরা প্রস্তুতির জগতে আপনাকে স্বাগতম!</p>
@@ -113,7 +106,8 @@ export default function SignupPage() {
           <button type="submit" className="btn-primary-lg w-full">সাইন আপ</button>
         </form>
 
-        <p className="mt-6 mb-48 text-center text-sm text-slate-400">
+        {/* FIX 2: Removed the large bottom margin */}
+        <p className="mt-6 text-center text-sm text-slate-400">
           আপনার কি একাউন্ট আছে?{' '}
           <Link href="/login" className="font-semibold text-indigo-400 hover:text-indigo-300">লগইন করুন</Link>
         </p>

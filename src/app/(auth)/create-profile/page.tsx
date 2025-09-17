@@ -1,4 +1,4 @@
-// src/app/create-profile/page.tsx
+// src/app/(auth)/create-profile/page.tsx
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
@@ -7,13 +7,12 @@ import Link from 'next/link'
 import { useAuth } from '@/app/context/AuthContext'
 import { updateProfile } from 'firebase/auth'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { storage } from '@/lib/firebase'
+import { storage, auth } from '@/lib/firebase'
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
 
 export default function CreateProfilePage() {
-  // --- LOGIC SECTION ---
-  const { user, refreshUser } = useAuth(); // Get the refreshUser function
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,11 +25,12 @@ export default function CreateProfilePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (user) {
-      if (user.displayName) setDisplayName(user.displayName);
-      if (user.photoURL) setPhotoPreview(user.photoURL);
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      if (currentUser.displayName) setDisplayName(currentUser.displayName);
+      if (currentUser.photoURL) setPhotoPreview(currentUser.photoURL);
     }
-  }, [user]);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,7 +42,9 @@ export default function CreateProfilePage() {
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
       setError('You must be logged in to create a profile.');
       return;
     }
@@ -55,36 +57,35 @@ export default function CreateProfilePage() {
     setError('');
 
     try {
-      let photoURL = user.photoURL;
+      let photoURL = currentUser.photoURL;
 
       if (photoFile) {
-        const storageRef = ref(storage, `profile-pictures/${user.uid}/${photoFile.name}`);
+        const storageRef = ref(storage, `profile-pictures/${currentUser.uid}/${photoFile.name}`);
         const snapshot = await uploadBytes(storageRef, photoFile);
         photoURL = await getDownloadURL(snapshot.ref);
       }
 
-      await updateProfile(user, {
+      await updateProfile(currentUser, {
         displayName: displayName,
         photoURL: photoURL,
       });
 
-      // Refresh the user state in the context BEFORE redirecting
       await refreshUser();
       
       console.log("Profile Saved & Refreshed!");
-      // In a real app, save extra data (institution, hscBatch) to Firestore here
       console.log("Institution:", institution, "HSC Batch:", hscBatch);
 
-      router.push('/');
+      // --- THIS IS THE ADJUSTED REDIRECT ---
+      router.push('/profile');
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error creating profile:", err);
       setError('Failed to save profile. Please try again.');
-      setIsLoading(false); // Only stop loading if there's an error
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // --- UI SECTION (Your exact code, with only minor corrections) ---
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
       <div className="w-full max-w-md">
@@ -100,7 +101,9 @@ export default function CreateProfilePage() {
 
         <form onSubmit={handleProfileSave} className="mt-8 space-y-6">
           <div className="flex justify-center">
+            <label htmlFor="photo-upload" className="sr-only">Upload profile picture</label>
             <input 
+              id="photo-upload"
               type="file" 
               accept="image/*" 
               ref={fileInputRef} 
