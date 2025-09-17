@@ -10,10 +10,10 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage, auth } from '@/lib/firebase'
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
-import { isFirebaseError } from '@/app/lib/utils' // Import the type guard
+import { isFirebaseError } from '@/lib/utils'
 
 export default function CreateProfilePage() {
-  const { refreshUser } = useAuth(); // We only need refreshUser from the context
+  const { refreshUser } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +26,6 @@ export default function CreateProfilePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Use auth.currentUser for the most immediate data upon page load
     const currentUser = auth.currentUser;
     if (currentUser) {
       if (currentUser.displayName) setDisplayName(currentUser.displayName);
@@ -76,24 +75,33 @@ export default function CreateProfilePage() {
       
       router.push('/profile');
       
-    } catch (err:any) {
+    } catch (err) {
       console.error("Error creating profile:", err);
       if (isFirebaseError(err)) {
         setError('Failed to save profile. Please try again.');
       } else {
         setError('An unexpected error occurred.');
       }
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only stop loading on error
     }
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
       <div className="w-full max-w-md">
-       
-        <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">আপনার প্রোফাইল সেটআপ করুন</h1>
-        <p className="mt-2 text-center text-sm text-slate-400">আপনার একাউন্ট প্রায় তৈরি! এই তথ্যগুলো অন্যদের আপনাকে চিনতে সাহায্য করবে।</p>
+        <div className="flex justify-center">
+          <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
+            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+              BitByBit
+            </span>
+          </Link>
+        </div>
+
+        {/* --- UI ADJUSTMENT: Centered Text --- */}
+        <div className="text-center">
+            <h1 className="mt-8 text-2xl font-bold text-slate-50">আপনার প্রোফাইল সেটআপ করুন</h1>
+            <p className="mt-2 text-sm text-slate-400">আপনার একাউন্ট প্রায় তৈরি! এই তথ্যগুলো অন্যদের আপনাকে চিনতে সাহায্য করবে।</p>
+        </div>
 
         <form onSubmit={handleProfileSave} className="mt-8 space-y-6">
           <div className="flex justify-center">
