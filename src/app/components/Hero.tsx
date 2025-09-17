@@ -1,9 +1,10 @@
 // src/app/components/Hero.tsx
 'use client'
 
-import { motion } from 'framer-motion' // Import framer-motion
+import { motion, Variants } from 'framer-motion'
 import { StatsRow } from './Stats'
 import ChipCarousel from './ChipCarousel';
+
 
 // Define the data for the desktop buttons
 const desktopChips = [
@@ -15,54 +16,45 @@ const desktopChips = [
   { text: "📊 র‍্যাঙ্কিং ও অ্যানালিটিক্স", href: "#exams" },
 ];
 
-// Animation variants for the container and its children
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.2, // Time delay between each child animating in
-    },
+    transition: { staggerChildren: 0.2, delayChildren: 0.2, },
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: 'easeOut',
-    },
+    transition: { ease: 'easeOut', duration: 0.5, },
   },
 };
-
 
 export default function Hero() {
   return (
     <section id="home" className="relative overflow-hidden bg-slate-900">
       
-      {/* Blueprint grid pattern */}
+      {/* --- THIS IS THE FIX --- */}
+      {/* The inline style attribute has been replaced with the .blueprint-grid class */}
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none opacity-20"
-        style={{ /* ... blueprint styles ... */ }}
+        className="absolute inset-0 pointer-events-none opacity-20 blueprint-grid"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 items-center py-24 sm:py-32">
           
-          {/* Main content container is now the animation parent */}
           <motion.div 
             className="text-center px-4 sm:px-0"
             variants={containerVariants}
             initial="hidden"
-            animate="visible" // Animate automatically on load
+            animate="visible"
           >
          
-            {/* The h1 is now a motion component with its own variant */}
-            <motion.h1 
+    <motion.h1 
               variants={itemVariants}
               className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-slate-50"
             >
@@ -97,7 +89,6 @@ export default function Hero() {
               <StatsRow />
             </motion.div>
 
-            {/* DESKTOP CHIP BUTTONS */}
             <motion.div 
               variants={itemVariants}
               className="hidden md:flex flex-wrap items-center justify-center gap-3 mt-10 max-w-4xl mx-auto"
@@ -114,7 +105,6 @@ export default function Hero() {
               ))}
             </motion.div>
 
-            {/* MOBILE CHIP CAROUSEL */}
             <motion.div variants={itemVariants} className="mt-10 max-w-md mx-auto md:hidden">
               <ChipCarousel/>
             </motion.div>

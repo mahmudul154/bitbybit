@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, getAdditionalUserInfo } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
+// --- FIX 1: Added the complete SVG code ---
 const GoogleIcon = () => (
   <svg className="h-5 w-5" viewBox="0 0 48 48">
     <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
@@ -53,16 +54,24 @@ export default function LoginPage() {
         router.push('/');
       }
     } catch (err: any) {
-      setError("Failed to sign in with Google.");
-      console.error(err);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError("Failed to sign in with Google.");
+        console.error(err);
+      }
     }
   };
 
   return (
-    // --- THIS IS THE ADJUSTED BACKGROUND COLOR ---
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
+    // FIX 2: Matched background color to other auth pages
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12">
       <div className="w-full max-w-sm">
-       
+        <div className="flex justify-center">
+            <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
+              <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
+                BitByBit
+              </span>
+            </Link>
+        </div>
         <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">স্বাগতম!</h1>
         <p className="mt-2 text-center text-sm text-slate-400">লগইন করে আপনার প্রস্তুতি চালিয়ে যান।</p>
 

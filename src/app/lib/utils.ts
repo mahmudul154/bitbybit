@@ -53,3 +53,9 @@ export function pillForDifficulty(difficulty: 'Easy' | 'Medium' | 'Hard') {
   }
   return map[difficulty]
 }
+// src/lib/utils.ts
+
+// A type guard to check if an error is a FirebaseError
+export const isFirebaseError = (err: unknown): err is { code: string; message: string } => {
+  return typeof err === 'object' && err !== null && 'code' in err && 'message' in err;
+};

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, } from 'next/navigation';
 import Link from 'next/link';
 import { getQuizById, Quiz, QuizQuestion } from '@/app/data/quizzes';
 import LoadingScreen from '@/app/components/LoadingScreen';

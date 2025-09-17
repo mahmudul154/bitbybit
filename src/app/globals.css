@@ -110,3 +110,10 @@ body {
   /* Constrains the width for better readability */
   @apply max-w-3xl;
 }
+/* Add this to globals.css */
+
+.blueprint-grid {
+  background-image: linear-gradient(to right, rgba(2, 6, 23, 0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(2, 6, 23, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+}

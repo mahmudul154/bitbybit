@@ -10,9 +10,10 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage, auth } from '@/lib/firebase'
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
+import { isFirebaseError } from '@/app/lib/utils' // Import the type guard
 
 export default function CreateProfilePage() {
-  const {  refreshUser } = useAuth();
+  const { refreshUser } = useAuth(); // We only need refreshUser from the context
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,6 +26,7 @@ export default function CreateProfilePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Use auth.currentUser for the most immediate data upon page load
     const currentUser = auth.currentUser;
     if (currentUser) {
       if (currentUser.displayName) setDisplayName(currentUser.displayName);
@@ -72,15 +74,15 @@ export default function CreateProfilePage() {
 
       await refreshUser();
       
-      console.log("Profile Saved & Refreshed!");
-      console.log("Institution:", institution, "HSC Batch:", hscBatch);
-
-      // --- THIS IS THE ADJUSTED REDIRECT ---
       router.push('/profile');
       
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error creating profile:", err);
-      setError('Failed to save profile. Please try again.');
+      if (isFirebaseError(err)) {
+        setError('Failed to save profile. Please try again.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
     } finally {
       setIsLoading(false);
     }
