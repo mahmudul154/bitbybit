@@ -10,7 +10,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage, auth } from '@/lib/firebase'
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
-import { isFirebaseError } from '@/lib/utils'
+import { isFirebaseError } from '@/app/lib/utils'
 
 export default function CreateProfilePage() {
   const { refreshUser } = useAuth();
