@@ -60,13 +60,7 @@ export default function SignupPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
       <div className="w-full max-w-sm">
         
-        <div className="flex justify-center">
-          <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
-            <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
-              BitByBit
-            </span>
-          </Link>
-        </div>
+       
 
         <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">নতুন একাউন্ট খুলুন</h1>
         <p className="mt-2 text-center text-sm text-slate-400">সেরা প্রস্তুতির জগতে আপনাকে স্বাগতম!</p>
