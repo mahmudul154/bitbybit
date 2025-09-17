@@ -7,14 +7,13 @@ import Link from 'next/link'
 import { useAuth } from '@/app/context/AuthContext'
 import { updateProfile } from 'firebase/auth'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { storage } from '@/lib/firebase' // auth is not needed here
+import { storage, auth } from '@/lib/firebase'
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
-import { isFirebaseError } from '@/lib/utils'
+import { isFirebaseError } from '@/app/lib/utils' // Import the type guard
 
 export default function CreateProfilePage() {
-  // --- FIX 1: Get the 'user' object from the context ---
-  const { user, refreshUser } = useAuth(); 
+  const { refreshUser } = useAuth(); // We only need refreshUser from the context
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,13 +25,14 @@ export default function CreateProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // The dependency array now correctly includes 'user'
   useEffect(() => {
-    if (user) {
-      if (user.displayName) setDisplayName(user.displayName);
-      if (user.photoURL) setPhotoPreview(user.photoURL);
+    // Use auth.currentUser for the most immediate data upon page load
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      if (currentUser.displayName) setDisplayName(currentUser.displayName);
+      if (currentUser.photoURL) setPhotoPreview(currentUser.photoURL);
     }
-  }, [user]);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,9 +44,9 @@ export default function CreateProfilePage() {
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // --- FIX 2: Use the 'user' object from the context ---
-    if (!user) {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
       setError('You must be logged in to create a profile.');
       return;
     }
@@ -59,17 +59,15 @@ export default function CreateProfilePage() {
     setError('');
 
     try {
-      let photoURL = user.photoURL;
+      let photoURL = currentUser.photoURL;
 
       if (photoFile) {
-        // Use the context user's uid
-        const storageRef = ref(storage, `profile-pictures/${user.uid}/${photoFile.name}`);
+        const storageRef = ref(storage, `profile-pictures/${currentUser.uid}/${photoFile.name}`);
         const snapshot = await uploadBytes(storageRef, photoFile);
         photoURL = await getDownloadURL(snapshot.ref);
       }
 
-      // Use the context user object to update
-      await updateProfile(user, {
+      await updateProfile(currentUser, {
         displayName: displayName,
         photoURL: photoURL,
       });
@@ -78,32 +76,24 @@ export default function CreateProfilePage() {
       
       router.push('/profile');
       
-    } catch (err) { // Error is of type 'unknown'
+    } catch (err:any) {
       console.error("Error creating profile:", err);
-      if (isFirebaseError(err)) { // Use the type guard
+      if (isFirebaseError(err)) {
         setError('Failed to save profile. Please try again.');
       } else {
         setError('An unexpected error occurred.');
       }
-      setIsLoading(false); // Only stop loading on error
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="flex justify-center">
-          <Link href="/" className="flex items-baseline text-4xl font-extrabold animate-slow-pulse">
-            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
-              BitByBit
-            </span>
-          </Link>
-        </div>
-
-        <div className="text-center">
-            <h1 className="mt-8 text-2xl font-bold text-slate-50">আপনার প্রোফাইল সেটআপ করুন</h1>
-            <p className="mt-2 text-sm text-slate-400">আপনার একাউন্ট প্রায় তৈরি! এই তথ্যগুলো অন্যদের আপনাকে চিনতে সাহায্য করবে।</p>
-        </div>
+       
+        <h1 className="mt-8 text-center text-2xl font-bold text-slate-50">আপনার প্রোফাইল সেটআপ করুন</h1>
+        <p className="mt-2 text-center text-sm text-slate-400">আপনার একাউন্ট প্রায় তৈরি! এই তথ্যগুলো অন্যদের আপনাকে চিনতে সাহায্য করবে।</p>
 
         <form onSubmit={handleProfileSave} className="mt-8 space-y-6">
           <div className="flex justify-center">
