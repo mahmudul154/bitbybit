@@ -5,7 +5,7 @@ import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import LoadingScreen from '@/app/components/LoadingScreen';
 import QuizComponent from './QuizComponent';
-//import AnimatedLogo from '../components/AnimatedLogo';
+
 // Create a new component to safely use the hook
 function QuizPageContent() {
   const searchParams = useSearchParams();
