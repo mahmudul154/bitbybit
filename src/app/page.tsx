@@ -206,7 +206,7 @@ export default function Page() {
       {/* Subscribe CTA */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-16">
         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-center">
-          <h5 className="text-2xl font-extrabold text-slate-50">{`ভর্তি বিজ্ঞপ্তি, লাইভ পরীক্ষার আপডেট ও গুরুত্বপূর্ণ টিপস সরাসরি আপনার ইনবক্সে।`}</h5>
+          <p className="text-sm font-semibold text-slate-50">{`ভর্তি বিজ্ঞপ্তি, লাইভ পরীক্ষার আপডেট ও গুরুত্বপূর্ণ টিপস সরাসরি আপনার ইনবক্সে।`}</p>
         
           <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <input type="email" placeholder="আপনার ইমেইল লিখুন" className="w-full sm:w-80 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 placeholder:text-slate-500 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />

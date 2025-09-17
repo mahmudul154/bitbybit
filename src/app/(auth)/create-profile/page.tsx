@@ -7,13 +7,14 @@ import Link from 'next/link'
 import { useAuth } from '@/app/context/AuthContext'
 import { updateProfile } from 'firebase/auth'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { storage, auth } from '@/lib/firebase'
+import { storage } from '@/lib/firebase' // auth is not needed here
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
-import { isFirebaseError } from '@/app/lib/utils'
+import { isFirebaseError } from '@/lib/utils'
 
 export default function CreateProfilePage() {
-  const { refreshUser } = useAuth();
+  // --- FIX 1: Get the 'user' object from the context ---
+  const { user, refreshUser } = useAuth(); 
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -25,13 +26,13 @@ export default function CreateProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // The dependency array now correctly includes 'user'
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      if (currentUser.displayName) setDisplayName(currentUser.displayName);
-      if (currentUser.photoURL) setPhotoPreview(currentUser.photoURL);
+    if (user) {
+      if (user.displayName) setDisplayName(user.displayName);
+      if (user.photoURL) setPhotoPreview(user.photoURL);
     }
-  }, []);
+  }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,9 +44,9 @@ export default function CreateProfilePage() {
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
+    
+    // --- FIX 2: Use the 'user' object from the context ---
+    if (!user) {
       setError('You must be logged in to create a profile.');
       return;
     }
@@ -58,15 +59,17 @@ export default function CreateProfilePage() {
     setError('');
 
     try {
-      let photoURL = currentUser.photoURL;
+      let photoURL = user.photoURL;
 
       if (photoFile) {
-        const storageRef = ref(storage, `profile-pictures/${currentUser.uid}/${photoFile.name}`);
+        // Use the context user's uid
+        const storageRef = ref(storage, `profile-pictures/${user.uid}/${photoFile.name}`);
         const snapshot = await uploadBytes(storageRef, photoFile);
         photoURL = await getDownloadURL(snapshot.ref);
       }
 
-      await updateProfile(currentUser, {
+      // Use the context user object to update
+      await updateProfile(user, {
         displayName: displayName,
         photoURL: photoURL,
       });
@@ -75,9 +78,9 @@ export default function CreateProfilePage() {
       
       router.push('/profile');
       
-    } catch (err) {
+    } catch (err) { // Error is of type 'unknown'
       console.error("Error creating profile:", err);
-      if (isFirebaseError(err)) {
+      if (isFirebaseError(err)) { // Use the type guard
         setError('Failed to save profile. Please try again.');
       } else {
         setError('An unexpected error occurred.');
@@ -97,7 +100,6 @@ export default function CreateProfilePage() {
           </Link>
         </div>
 
-        {/* --- UI ADJUSTMENT: Centered Text --- */}
         <div className="text-center">
             <h1 className="mt-8 text-2xl font-bold text-slate-50">আপনার প্রোফাইল সেটআপ করুন</h1>
             <p className="mt-2 text-sm text-slate-400">আপনার একাউন্ট প্রায় তৈরি! এই তথ্যগুলো অন্যদের আপনাকে চিনতে সাহায্য করবে।</p>
